@@ -1,0 +1,41 @@
+# Build output
+live/
+
+# Internal files
+MARKETING-REVIEW.md
+FINAL-LIVE-AUDIT*.md
+STATUS.md
+scripts/build.sh
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+.venv/
+venv/
+
+# Environment
+.env
+*.env.local
+
+# Database (runtime)
+*.db
+*.db-wal
+*.db-shm
+
+# Logs
+logs/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

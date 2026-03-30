@@ -1,0 +1,15 @@
+[Unit]
+Description=FlowClaw Workflow Executor
+After=network.target
+
+[Service]
+Type=simple
+User=your-user
+WorkingDirectory=/path/to/flowclaw/src
+ExecStart=/usr/bin/python3 workflow-executor.py
+Restart=always
+RestartSec=5
+EnvironmentFile=/path/to/flowclaw/.env
+
+[Install]
+WantedBy=multi-user.target
