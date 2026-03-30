@@ -23,7 +23,7 @@ FlowClaw v1.0.0 is fully functional for workflow orchestration, approval gates, 
 ## Security Notes
 
 - **Default bind address is `[IP_ADDRESS]`** (local only). If you need network access, change the bind address in `config/example.env` or the start script, and ensure `WORKFLOW_EXECUTOR_API_KEY` authentication is configured.
-- **Credential loading:** FlowClaw will attempt to load API keys from `~/.openclaw/openclaw.json` if environment variables are not set. Review your OpenClaw config before running, or set all required variables explicitly via `.env` to prevent unintended credential inheritance.
+- **Credential isolation (default):** FlowClaw only reads API keys from environment variables or `.env` files. It does **not** automatically inherit credentials from `~/.openclaw/openclaw.json`. To opt in to config file loading, set `FLOWCLAW_LOAD_OPENCLAW_CONFIG=true` — but be aware this gives FlowClaw access to all credentials in your global OpenClaw config.
 - **SQLite state:** Workflow state is persisted in a local SQLite database. Ensure the data directory is not world-readable.
 
 ## Quick Start

@@ -24,7 +24,6 @@ import hmac
 import json
 import logging
 import os
-import pickle
 import re
 import shutil
 import sqlite3
@@ -265,17 +264,42 @@ def _track_run_end(run_id: str, workflow_name: str, status: str, duration_s: flo
 
 
 def _load_env_from_openclaw() -> None:
-    """Load API keys from openclaw.json env block if they're not in environment."""
+    """Load API keys from openclaw.json env block — OPT-IN ONLY.
+
+    Set FLOWCLAW_LOAD_OPENCLAW_CONFIG=true to enable.
+    By default, FlowClaw only reads credentials from environment variables or .env files.
+    """
+    opt_in = os.environ.get("FLOWCLAW_LOAD_OPENCLAW_CONFIG", "").lower().strip()
+    if opt_in != "true":
+        return
+
     if not OPENCLAW_CONFIG.exists():
         return
+
+    log.warning(
+        "Loading credentials from openclaw.json — this is opt-in behavior. "
+        "Set credentials via .env or environment variables for tighter isolation.",
+        config_path=str(OPENCLAW_CONFIG),
+    )
+
     try:
         config = json.loads(OPENCLAW_CONFIG.read_text())
         env_block = config.get("env", {})
-        for key in ["NOTION_API_KEY", "DISCORD_BOT_TOKEN", "N8N_API_KEY",
-                    "OPENCLAW_GATEWAY_URL", "OPENCLAW_GATEWAY_TOKEN",
-                    "WORKFLOW_EXECUTOR_API_KEY"]:
+        loaded_keys = []
+        for key in [
+            "NOTION_API_KEY", "DISCORD_BOT_TOKEN", "N8N_API_KEY",
+            "OPENCLAW_GATEWAY_URL", "OPENCLAW_GATEWAY_TOKEN",
+            "WORKFLOW_EXECUTOR_API_KEY",
+        ]:
             if key not in os.environ and key in env_block:
                 os.environ[key] = env_block[key]
+                loaded_keys.append(key)
+        if loaded_keys:
+            log.info(
+                "Loaded credentials from openclaw.json",
+                keys=loaded_keys,
+                count=len(loaded_keys),
+            )
     except Exception as exc:
         log.warning("Failed to load env from openclaw.json", error=str(exc))
 
@@ -287,16 +311,17 @@ DISCORD_BOT_TOKEN = os.environ.get("DISCORD_BOT_TOKEN", "")
 OPENCLAW_GATEWAY_URL = os.environ.get("OPENCLAW_GATEWAY_URL", "")
 OPENCLAW_GATEWAY_TOKEN = os.environ.get("OPENCLAW_GATEWAY_TOKEN", "")
 
-if not OPENCLAW_GATEWAY_URL and OPENCLAW_CONFIG.exists():
-    try:
-        config = json.loads(OPENCLAW_CONFIG.read_text())
-        gateway = config.get("gateway", {})
-        if gateway.get("bind", "loopback") == "loopback":
-            OPENCLAW_GATEWAY_URL = "http://127.0.0.1:18789"
-        if not OPENCLAW_GATEWAY_TOKEN:
-            OPENCLAW_GATEWAY_TOKEN = config.get("gateway", {}).get("auth", {}).get("token", "")
-    except Exception:
-        pass
+if not OPENCLAW_GATEWAY_URL and os.environ.get("FLOWCLAW_LOAD_OPENCLAW_CONFIG", "").lower().strip() == "true":
+    if OPENCLAW_CONFIG.exists():
+        try:
+            config = json.loads(OPENCLAW_CONFIG.read_text())
+            gateway = config.get("gateway", {})
+            if gateway.get("bind", "loopback") == "loopback":
+                OPENCLAW_GATEWAY_URL = "http://[IP_ADDRESS]:18789"
+            if not OPENCLAW_GATEWAY_TOKEN:
+                OPENCLAW_GATEWAY_TOKEN = config.get("gateway", {}).get("auth", {}).get("token", "")
+        except Exception:
+            pass
 
 
 # ---------------------------------------------------------------------------
@@ -1093,6 +1118,10 @@ class WorkflowExecutor:
         if not openclaw_bin:
             return {"status": "failed", "error": "openclaw CLI not found in PATH"}
 
+        ALLOWED_AGENTS = {"frontend", "backend", "creative", "quality", "devops", "main"}
+        if agent_id not in ALLOWED_AGENTS:
+            return {"status": "failed", "error": f"Unknown agent: {agent_id!r}. Allowed: {sorted(ALLOWED_AGENTS)}"}
+
         session_id = f"wf-{self.run_id}-{agent_id}"
         cmd = [openclaw_bin, "agent", "--agent", agent_id, "--message", task_text,
                "--session-id", session_id, "--timeout", str(timeout_s), "--json"]
@@ -1273,7 +1302,10 @@ class WorkflowExecutor:
             except ValueError as exc:
                 return {"status": "failed", "error": f"Invalid cwd: {exc}"}
         else:
-            work_dir = WORKSPACE / project
+            try:
+                work_dir = _safe_path(WORKSPACE, project)
+            except ValueError as exc:
+                return {"status": "failed", "error": f"Invalid project path: {exc}"}
 
         if not work_dir.exists():
             deploy_url = f"https://{project}"
@@ -1876,7 +1908,6 @@ def list_workflows():
 def _on_startup() -> None:
     """Called once per gunicorn worker on startup."""
     log.info("Workflow Executor worker started", version=VERSION, pid=os.getpid())
-    _load_env_from_openclaw()
     LOGS_DIR.mkdir(parents=True, exist_ok=True)
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     PENDING_APPROVALS_DIR.mkdir(parents=True, exist_ok=True)
