@@ -2,7 +2,7 @@
 
 **Automate your agent workflows. Stay in control of what happens next.**
 
-FlowClaw orchestrates your AI agent teams through automated multi-step workflows — with approval gates that pause and wait for your go-ahead before anything critical runs. Integrates with Notion, n8n, and Discord (all optional).
+FlowClaw orchestrates your AI agent teams through automated multi-step workflows — with approval gates that pause and wait for your go-ahead before anything critical runs. 
 
 ## Features
 
@@ -19,6 +19,12 @@ FlowClaw orchestrates your AI agent teams through automated multi-step workflows
 FlowClaw v1.0.0 is fully functional for workflow orchestration, approval gates, Notion sync, and Discord notifications. Agent dispatch and deploy steps work but need to be wired up for your specific setup — they're not auto-configured out of the box.
 
 → See [INTEGRATION-STEPS.md](docs/INTEGRATION-STEPS.md) for what to configure first.
+
+## Security Notes
+
+- **Default bind address is `[IP_ADDRESS]`** (local only). If you need network access, change the bind address in `config/example.env` or the start script, and ensure `WORKFLOW_EXECUTOR_API_KEY` authentication is configured.
+- **Credential loading:** FlowClaw will attempt to load API keys from `~/.openclaw/openclaw.json` if environment variables are not set. Review your OpenClaw config before running, or set all required variables explicitly via `.env` to prevent unintended credential inheritance.
+- **SQLite state:** Workflow state is persisted in a local SQLite database. Ensure the data directory is not world-readable.
 
 ## Quick Start
 

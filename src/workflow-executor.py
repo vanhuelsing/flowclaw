@@ -1892,7 +1892,7 @@ def main() -> None:
     """Dev-mode Flask runner with threading."""
     log.info("Starting Workflow Executor (dev mode)", version=VERSION)
     _on_startup()
-    app.run(host="0.0.0.0", port=8765, debug=False, threaded=True)
+    app.run(host="127.0.0.1", port=8765, debug=False, threaded=True)
 
 
 if __name__ == "__main__":

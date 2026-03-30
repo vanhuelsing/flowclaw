@@ -33,11 +33,11 @@ fi
 cd "$SCRIPT_DIR"
 
 echo "Starting FlowClaw Workflow Executor with Gunicorn..."
-echo "Workers: 4 | Bind: 0.0.0.0:8765 | Log: $LOGS_DIR/workflow-executor.log"
+echo "Workers: 4 | Bind: 127.0.0.1:8765 | Log: $LOGS_DIR/workflow-executor.log"
 
 exec "$GUNICORN" \
     --workers 4 \
-    --bind 0.0.0.0:8765 \
+    --bind 127.0.0.1:8765 \
     --timeout 600 \
     --graceful-timeout 30 \
     --keep-alive 5 \
