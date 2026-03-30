@@ -1,28 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  FlowClaw macOS LaunchAgent template
+  =====================================
+  Platform: macOS ONLY. Not applicable to Linux or Windows.
+  Linux users: use config/workflow-executor.service (systemd) instead.
+  Windows users: FlowClaw does not support Windows — see README.md § Platform Support.
+  Replace ALL occurrences of /ABSOLUTE/PATH/TO/flowclaw with the actual
+  absolute path to your flowclaw project directory before loading.
+
+  Example (replace with your actual path):
+    /ABSOLUTE/PATH/TO/flowclaw → /Users/yourname/.openclaw/projects/flowclaw
+
+  To install:
+    cp config/launchagent.plist ~/Library/LaunchAgents/ai.flowclaw.workflow-executor.plist
+    # Edit the file and replace /ABSOLUTE/PATH/TO/flowclaw
+    launchctl load ~/Library/LaunchAgents/ai.flowclaw.workflow-executor.plist
+
+  To verify:
+    launchctl list | grep flowclaw
+    curl http://127.0.0.1:8765/health
+
+  To unload:
+    launchctl unload ~/Library/LaunchAgents/ai.flowclaw.workflow-executor.plist
+-->
 <plist version="1.0">
 <dict>
     <key>Label</key>
     <string>ai.flowclaw.workflow-executor</string>
     <key>ProgramArguments</key>
     <array>
-        <string>/usr/bin/python3</string>
-        <string>workflow-executor.py</string>
+        <string>/ABSOLUTE/PATH/TO/flowclaw/src/scripts/start-workflow-executor.sh</string>
     </array>
     <key>WorkingDirectory</key>
-    <string>/path/to/flowclaw/src</string>
+    <string>/ABSOLUTE/PATH/TO/flowclaw/src</string>
     <key>EnvironmentVariables</key>
     <dict>
+        <!-- Load your .env file path — the start script reads it automatically -->
+        <key>FLOWCLAW_ENV_FILE</key>
+        <string>/ABSOLUTE/PATH/TO/flowclaw/.env</string>
         <key>PATH</key>
-        <string>/usr/local/bin:/usr/bin:/bin</string>
+        <string>/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin</string>
     </dict>
     <key>RunAtLoad</key>
     <true/>
     <key>KeepAlive</key>
     <true/>
     <key>StandardOutPath</key>
-    <string>/path/to/flowclaw/logs/workflow-executor.log</string>
+    <string>/ABSOLUTE/PATH/TO/flowclaw/logs/workflow-executor.log</string>
     <key>StandardErrorPath</key>
-    <string>/path/to/flowclaw/logs/workflow-executor-error.log</string>
+    <string>/ABSOLUTE/PATH/TO/flowclaw/logs/workflow-executor-error.log</string>
+    <!-- Restart on crash with 10s delay -->
+    <key>ThrottleInterval</key>
+    <integer>10</integer>
 </dict>
 </plist>

@@ -39,3 +39,4 @@ logs/
 .idea/
 *.swp
 *.swo
+SECURITY-AUDIT-RESPONSE.md

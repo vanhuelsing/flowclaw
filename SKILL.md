@@ -1,6 +1,10 @@
 ---
 name: flowclaw
+version: 1.1.3
 description: YAML-driven workflow orchestrator for AI agent teams with human-in-the-loop approval gates. Includes optional Notion, n8n, and Discord integrations.
+platforms:
+  - macOS
+  - Linux
 metadata:
   openclaw:
     requires:
@@ -29,9 +33,9 @@ FlowClaw is a workflow execution engine that:
 ## Requirements
 
 - Python 3.8+
-- n8n (self-hosted recommended)
-- Notion workspace with task database
 - OpenClaw with configured agents
+- n8n (optional — only needed for n8n-triggered workflows)
+- Notion workspace with task database (optional — only needed for Notion sync)
 
 ## Setup
 
