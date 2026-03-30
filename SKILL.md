@@ -1,6 +1,6 @@
 ---
 name: flowclaw
-description: YAML-driven workflow orchestrator for AI agent teams. Connects Notion, n8n, and OpenClaw agents with human-in-the-loop approval gates.
+description: YAML-driven workflow orchestrator for AI agent teams with human-in-the-loop approval gates. Integrates with Notion, n8n, and Discord (all optional).
 ---
 
 # FlowClaw

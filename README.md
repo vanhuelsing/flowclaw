@@ -2,7 +2,7 @@
 
 **Automate your agent workflows. Stay in control of what happens next.**
 
-FlowClaw connects Notion, n8n, and your OpenClaw agents into automated multi-step workflows — with approval gates that pause and wait for your go-ahead before anything critical runs.
+FlowClaw orchestrates your AI agent teams through automated multi-step workflows — with approval gates that pause and wait for your go-ahead before anything critical runs. Integrates with Notion, n8n, and Discord (all optional).
 
 ## Features
 
@@ -22,7 +22,7 @@ FlowClaw v1.0.0 is fully functional for workflow orchestration, approval gates, 
 
 ## Quick Start
 
-**Prerequisites:** Python 3.8+, n8n (self-hosted), a Notion API key, OpenClaw with configured agents.
+**Prerequisites:** Python 3.8+, OpenClaw with configured agents. Optional: n8n, Notion API key, Discord bot token.
 
 1. Install dependencies:
    ```bash
@@ -100,10 +100,10 @@ flowclaw/
 ## Requirements
 
 - Python 3.8+
-- n8n (self-hosted)
-- Notion API key
-- Discord bot token (optional)
 - OpenClaw (for agent execution)
+- n8n (optional — for Notion trigger automation)
+- Notion API key (optional — for task management)
+- Discord bot token (optional — for notifications)
 
 ## License
 
